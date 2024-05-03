@@ -4,7 +4,7 @@ Look at the following link to get your gmail app password to store as an environ
 https://blog.coffeeinc.in/how-to-send-a-mail-using-flask-mail-and-gmail-smtp-in-python-eb235e5b2048 <br/>
 
 
-Do the following before sending emails: <br/>
+Do the following before sending emails. If it doesnt work, check your environment and redo these steps. <br/>
 
 Windows: <br/>
 setx MAIL_USERNAME "your_mail_username" (i.e, 'some_email@gmail.com) <br/>
