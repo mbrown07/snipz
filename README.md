@@ -21,3 +21,5 @@ echo $MAIL_USERNAME <br/>
 
 export MAIL_PASSWORD="YOUR_MAIL_PASSWORD" (received from link above - make sure to read the steps) <br/>
 echo $MAIL_PASSWORD <br/>
+
+after this, all you need to do to run the program is cd /snipz then execute 'flask run' in terminal <br/>
