@@ -1,0 +1,165 @@
+{% extends "header.html" %}
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Your Code Snippet</title>
+    <link href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism-tomorrow.css" rel="stylesheet">
+
+    <style>
+        .snippet-container {
+            margin-left: 25rem;
+            margin-right: 25rem;
+            margin-top: 5rem;
+            margin-bottom: 10rem;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        
+        .snippet-container h1 {
+            color: #333;
+        }
+
+        .snippet-container pre {
+            background-color: #292929;
+            border: 1px solid #eee;
+            padding: 10px;
+            overflow: auto; 
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .snippet-container code {
+            display: inline; 
+            white-space: pre;
+        }
+
+        #tag-style {
+            background-color: black;
+            display: inline-block;
+            margin-right: 0.5rem; 
+            border: 1px solid white;
+            border-radius: 0.25rem;
+            padding: 0.25rem;
+        }
+
+        .btn {
+            background-color:#333;
+            border-color:#eee;
+            border: 1rem;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin: 0.5rem 0.5rem 0.0rem 0.0rem;
+        }
+
+        .btn:hover {
+            background-color: #555;
+        }
+
+    </style>        
+</head>
+<div class="snippet-container">
+    <h1 style="font-size: 3rem; text-decoration: underline">{{ snippet.title }}</h1>
+    <p><strong>Language:</strong> {{ snippet.language }}</p>
+    <p><strong>Difficulty:</strong> {{ snippet.difficulty }}</p>
+    <h3>Code:</h3>
+    <pre><code class="language-{{ 'cpp' if snippet.language.lower() == 'c++' else snippet.language.lower() }}">{{ snippet.code }}</code></pre>
+    <p>Uploaded by: <b>{{ snippet.author.username }}</b></p>
+    <h2 style="font-size: 2rem;">Tags:</h2>
+    {% for tag in snippet.tags %}
+        <span id="tag-style">{{ tag }}</span>
+    {% endfor %}
+
+    <div class="button-container">
+        <button type="button" class="btn" onclick="likeSnippet('{{snippet.id}}')">Likes:
+            <span id="likes-count" style="text-decoration: underline;">{{ snippet.likes | length }}</span>
+        </button>
+        <button type="button" class="btn" onclick="dislikeSnippet('{{snippet.id}}')">Dislikes:
+            <span id="dislikes-count" style="text-decoration: underline;">{{ snippet.dislikes | length }}</span>
+        </button>
+    </div>
+
+    {% if current_user.is_authenticated %}
+    <div class="button-container">
+        <button type="button" class="btn btn-primary" onclick="saveSnip()">Save Code Snippet</button>
+    </div>
+    <div class="button-container">
+        <form method="POST" action="{{ url_for('snippets.send_email', snippet_id=snippet.id) }}">
+            {{ share_form.csrf_token }}
+            <input type="email" name="email" required placeholder="Enter recipient email" class="form-content" style="width: 25rem;">
+            <button type="submit" class="btn btn-primary">Share via Email</button>
+        </form>
+        {% for mesg in get_flashed_messages() %}
+            <h2><em>{{ mesg }}</em></h2>
+        {% endfor %}
+    </div>
+    <div>
+        <div class="container mx-auto">
+          <form method="POST" action="" class="review-form">
+            {{ form.csrf_token }}
+            <div class="form-group review-input">
+              {{ form.text.label }} {{ form.text(class="form-content") }}
+              {% if form.text.errors %}
+                <div class="alert alert-warning" role="alert">
+                  {% for error in form.text.errors %}
+                  <span>{{ error }}</span>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            {{ form.submit(class="review-button") }}
+          </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <div>
+        <h1 class="reviews-title"> Reviews
+            <small class="reviews-count"> {{ reviews | length }} reviews </small>
+          </h1>
+          <ul class="review-container">
+            {% for review in reviews %}
+              <li class="review flex gap-2">
+                <img class="h-20 w-20 rounded-lg" src="data:image/png;base64,{{review.image}}" alt="" />
+                <div class="w-full">
+                  <span class="review-date">{{ review.date }}</span>
+                  <a class="review-commenter" href="{{ url_for('snippets.user_detail', username=review.commenter) }}">
+                    @{{ review.commenter }}
+                  </a>
+                  <p class="review-content">{{ review.content }}</p>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/prismjs/prism.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-{{ 'cpp' if snippet.language.lower() == 'c++' else snippet.language.lower() }}.min.js"></script>
+<script>
+    function saveSnip() {
+        window.location.href = `/save-snippet/{{ snippet.id }}`;
+    }
+
+    function likeSnippet(snippetId) {
+        fetch(`/like-snippet/${snippetId}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('likes-count').textContent = data.likes;
+            document.getElementById('dislikes-count').textContent = data.dislikes;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function dislikeSnippet(snippetId) {
+        fetch(`/dislike-snippet/${snippetId}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('likes-count').textContent = data.likes;
+            document.getElementById('dislikes-count').textContent = data.dislikes;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+{% endblock %}

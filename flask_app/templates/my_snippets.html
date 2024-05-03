@@ -1,0 +1,54 @@
+{% extends "header.html" %}
+{% block content %}
+<style>
+  .container {
+    min-height: 60vh;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+    padding: 0.7rem;
+    border-radius: 1rem;
+    margin-bottom: 0.5rem;
+    background-color: #292929;
+    transition: background-color 0.3s ease;
+  }
+
+  li {
+    background-color: #292929;
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid white;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+  }
+
+  li:hover, h2:hover {
+    background-color: #333;
+  }
+
+  li a:hover, h2 {
+    text-decoration: underline;
+  }
+</style>
+
+<div class="container">
+    <h2>My Saved Snippets</h2>
+    {% if snippets %}
+    <ul style="width: 10%; text-align: center;">
+        {% for saved_snippet in snippets %}
+        <div>
+            <li><a href="{{ url_for('snippets.snippet_detail', snippet_id=saved_snippet.snippet.id) }}">{{ saved_snippet.snippet.title }}</a></li>
+        </div>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No snippets saved yet!</p>
+    {% endif %}
+</div>
+{% endblock %}

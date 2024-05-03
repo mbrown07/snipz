@@ -1,0 +1,156 @@
+{% extends "header.html" %}
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Your Code Snippet</title>
+    <style>
+        .review-form {
+            margin-bottom: 10%;
+            margin-left: 30%;
+            margin-right: 30%;
+            text-align: center;
+        }
+
+        .tags-container {
+            margin-bottom: 10px;
+        }
+
+        .tag-label {
+            display: inline-block;
+            background-color: #ddd;
+            color: black; 
+            border-radius: 4px;
+            padding: 5px;
+            margin-right: 5px; 
+            font-size: 14px;
+        }
+
+        .delete-tag {
+            margin-left: 5px;
+            color: red;
+            cursor: pointer;
+        }
+
+        .input[type="text"], .form-content {
+            padding: 5px;
+            margin-top: 5px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            width: 95%; 
+        }
+
+        #code-editor {
+            width: 95%;
+            height: 150px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<h1 style="text-align: center; font-size: 1.3rem; text-decoration: underline;">Upload Your Code Snippet</h1>
+<form class="review-form" method="POST" action="">
+    {{ form.csrf_token }}
+    <div class="">
+        {{ form.title.label }}<br>
+        {{ form.title(class="form-content") }}
+        {% if form.title.errors %}
+        <div class="alert alert-warning" role="alert">
+            {% for error in form.title.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    <div class="">
+        {{ form.code.label }}<br>
+        <textarea id="code-editor" name="code" class="form-content">{{ form.code.data or '' }}</textarea>
+        {% if form.code.errors %}
+        <div class="alert alert-warning" role="alert">
+            {% for error in form.code.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    <div class="">
+        {{ form.language.label }}
+        {{ form.language(class="form-content", onchange="updateEditorLanguage(this.value)") }}
+        {% if form.language.errors %}
+        <div class="alert alert-warning" role="alert">
+            {% for error in form.language.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    <div class="">
+        {{ form.tags.label }}
+        <div id="tags-list" class="tags-container"></div>
+        <input type="text" id="tag-input" placeholder="Enter a tag" class="form-content"/>
+        <input type="hidden" name="tags" id="tags-hidden" value="{{ form.tags.data }}">
+        <button type="button" onclick="addTag()">Add Tag</button>
+        {% if form.tags.errors %}
+        <div class="alert alert-warning" role="alert">
+            {% for error in form.tags.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    <div class="">
+        {{ form.difficulty.label }}
+        {{ form.difficulty(class="form-content") }}
+        {% if form.difficulty.errors %}
+        <div class="alert alert-warning" role="alert">
+            {% for error in form.difficulty.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    <div style="margin-left: 10rem; margin-right: 10rem;">{{ form.submit(class="review-button") }}</div>
+</form>
+
+<script>
+    document.getElementById('tag-input').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            addTag();
+        }
+    });
+
+    function addTag() {
+        var input = document.getElementById('tag-input');
+        var tag = input.value.trim();
+        if (tag) {
+            var tagsList = document.getElementById('tags-list');
+            var tagSpan = document.createElement('span');
+            tagSpan.textContent = tag;
+            tagSpan.className = 'tag-label';
+            var deleteBtn = document.createElement('button');
+            deleteBtn.textContent = '×';
+            deleteBtn.className = 'delete-tag';
+            deleteBtn.onclick = function() {
+                this.parentNode.remove();
+                updateHiddenTags();
+            };
+            tagSpan.appendChild(deleteBtn);
+            tagsList.appendChild(tagSpan);
+            updateHiddenTags();
+            input.value = '';
+        }
+    }
+
+    function updateHiddenTags() {
+        var tags = [];
+        document.querySelectorAll('#tags-list .tag-label').forEach(function(tagSpan) {
+            tags.push(tagSpan.textContent.slice(0, -1));
+        });
+        document.getElementById('tags-hidden').value = tags.join(',');
+    }
+
+    document.getElementById('code-editor').addEventListener('input', function() {
+        Prism.highlightElement(this);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "header.html" %} {% block content %}
+{% if error %}
+    <b class="text-red-400" role="alert">
+        {{ error }}
+    </b>
+{% endif %}
+<div class="container mx-auto w-full md:w-2/3 lg:w-1/3">
+    <img class="rounded-2xl" src="data:image/png;base64,{{image}}" alt="image">
+    <h1>{{ username }}'s Reviews</h1>
+    <br>
+    <p>Number of Reviews: {{ reviews|length }}</p>
+</div>
+<div class="container mx-auto w-full md:w-2/3 lg:w-1/3">
+    {% for r in reviews %}
+        <div class="review">
+            <p>Date: {{ r.date }}</p>
+            <p>Snippet: {{ r.snippet_title }}</p>
+            <p>Content: {{ r.content }}</p>
+        </div>
+        <br>
+    {% endfor %}
+</div>
+{% endblock %}

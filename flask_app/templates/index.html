@@ -1,0 +1,115 @@
+{% extends "header.html" %}
+{% block content %}
+<style>
+  .container {
+    min-height: 85vh;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 80%;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+    width: 100%;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 10px;
+    background-color: #292929;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    border: 1px solid white;
+    transition: background-color 0.3s ease; 
+  }
+
+  .btn-primary:hover {
+    background-color: #333;
+  }
+
+  h2 {
+    text-align: center;
+    font-size: 1.3rem;
+    margin-left: auto;
+    margin-right: auto;
+    text-decoration: underline;
+  }
+
+  ul {
+    width: 25%;
+  }
+
+  li {
+    background-color: #292929;
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid white;
+    border-radius: 8px;
+    transition: background-color 0.3s ease; 
+  }
+
+  li a {
+    color: #ddd;
+    text-decoration: none;
+    display: block; 
+  }
+
+  li:hover {
+    background-color: #333; 
+  }
+
+  li a:hover, .btn-primary:hover {
+    text-decoration: underline;
+  }
+
+</style>
+<div class="container">
+  <h2>Search a snippet!</h2>
+  <form action="{{ url_for('snippets.index') }}" method="post" class="form-horizontal">
+    {{ form.csrf_token }}
+
+    <div class="form-group">
+      {{ form.title.label(class="control-label") }}
+      {{ form.title(class="form-control", placeholder="Enter snippet title") }}
+    </div>
+    
+    <div class="form-group">
+      {{ form.tag.label(class="control-label") }}
+      {{ form.tag(class="form-control", placeholder="Enter a tag") }}
+    </div>
+
+    <div class="form-group">
+      {{ form.language.label(class="control-label") }}
+      {{ form.language(class="form-control") }}
+    </div>
+
+    <div class="form-group">
+      {{ form.difficulty.label(class="control-label") }}
+      {{ form.difficulty(class="form-control") }}
+    </div>
+
+    <div class="form-group">
+      {{ form.submit(class="btn btn-primary") }}
+    </div>
+  </form>
+  {% if snippets %}
+    <ul style="text-align: center">
+      {% for snippet in snippets %}
+      <li><a href="{{ url_for('snippets.snippet_detail', snippet_id=snippet.id) }}">{{ snippet.title }} - {{ snippet.language }} - {{ snippet.difficulty }}</a></li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</div>
+<div style="margin-bottom: 5%"></div>
+{% endblock %}
